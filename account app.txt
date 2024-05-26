@@ -1,0 +1,40 @@
+Data Pusher
+
+# accounts/serializers.py
+from rest_framework import serializers
+from .models import Account
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = '__all__'
+
+# accounts/views.py
+from rest_framework import viewsets
+from .models import Account
+from .serializers import AccountSerializer
+
+class AccountViewSet(viewsets.ModelViewSet):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+
+Destinations App 
+ # destinations/serializers.py
+from rest_framework import serializers
+from .models import Destination
+
+class DestinationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Destination
+        fields = '__all__'
+
+# destinations/views.py
+from rest_framework import viewsets
+from .models import Destination
+from .serializers import DestinationSerializer
+
+class DestinationViewSet(viewsets.ModelViewSet):
+    queryset = Destination.objects.all()
+    serializer_class = DestinationSerializer
+

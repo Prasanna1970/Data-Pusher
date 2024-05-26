@@ -1,0 +1,48 @@
+URL Pattern code
+
+# data_pusher/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from accounts.views import AccountViewSet
+from destinations.views import DestinationViewSet
+
+router = DefaultRouter()
+router.register(r'accounts', AccountViewSet)
+router.register(r'destinations', DestinationViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
+    path('server/incoming_data/', handle_incoming_data),
+]
+
+
+Implement Webhook Endpoint
+
+# data_pusher/views.py
+from django.http import JsonResponse
+from accounts.models import Account
+from destinations.models import Destination
+
+def handle_incoming_data(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    
+    data = request.POST.get('data')
+    if not data:
+        return JsonResponse({"error": "Invalid Data"}, status=400)
+    
+    app_secret_token = request.headers.get('CL-X-TOKEN')
+    if not app_secret_token:
+        return JsonResponse({"error": "Unauthenticated"}, status=401)
+    
+    # Identify account using app_secret_token
+    account = Account.objects.filter(app_secret_token=app_secret_token).first()
+    if not account:
+        return JsonResponse({"error": "Invalid Token"}, status=401)
+    
+    # Process data and send to destinations
+    for destination in account.destinations.all():
+        # Send data to destination using destination.url, destination.http_method, destination.headers
+        # Your logic here
+    
+    return JsonResponse({"success": True})
